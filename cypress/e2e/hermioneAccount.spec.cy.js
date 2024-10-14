@@ -9,6 +9,7 @@ describe('Bank app', () => {
   const withdrawlAmount = '150';
   const balanceAfterWithdraw = (+balanceAfterDeposit - +withdrawlAmount)
     .toString();
+  const otherAccountNumber = '1003';
 
   before(() => {
     cy.visit('/');
@@ -38,5 +39,19 @@ describe('Bank app', () => {
     cy.get('.error').should('contain', 'Transaction successful');
     cy.contains('[ng-hide="noAccount"]', 'Balance')
       .contains('strong', balanceAfterWithdraw).should('be.visible');
+
+    cy.contains('.btn', 'Transactions ').click();
+    cy.get('#start').type('2024-10-14T00:00');
+    cy.contains('tr', 'Credit').should('contain', depositAmount);
+    cy.contains('tr', 'Debit').should('contain', withdrawlAmount);
+
+    cy.contains('.btn', 'Back').click();
+    cy.get('#accountSelect').select(otherAccountNumber);
+    cy.contains('.btn', 'Transactions ').click();
+    cy.contains('tr', 'Credit').should('not.exist');
+    cy.contains('tr', 'Debit').should('not.exist');
+
+    cy.get('.logout').click();
+    cy.get('#userSelect').should('be.visible');
   });
 });
